@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Inter:wght@400;500&display=swap');
+
+:root {
+  /* Brand palette */
+  --color-forest:         #2D5A27;
+  --color-forest-light:   #3D7A35;
+  --color-bark:           #6B4226;
+  --color-bark-light:     #8B5A3A;
+  --color-cream:          #F5F0E8;
+  --color-cream-dark:     #EDE6D6;
+  --color-charcoal:       #2C2C2A;
+  --color-charcoal-mid:   #444441;
+  --color-charcoal-light: #6B6B67;
+
+  /* Semantic */
+  --color-bg:           var(--color-cream);
+  --color-bg-secondary: var(--color-cream-dark);
+  --color-surface:      #FFFFFF;
+  --color-text:         var(--color-charcoal);
+  --color-text-secondary: var(--color-charcoal-mid);
+  --color-text-muted:   var(--color-charcoal-light);
+  --color-border:       #D8D0C0;
+  --color-border-light: #E8E2D6;
+  --color-accent:       var(--color-forest);
+  --color-accent-hover: var(--color-forest-light);
+
+  /* Tracker colors */
+  --color-sleep:        #534AB7;
+  --color-workout:      #2D5A27;
+  --color-meals:        #B84A1A;
+  --color-hydration:    #0B6E9E;
+  --color-mood:         #A03060;
+  --color-weight:       #666460;
+
+  /* Typography */
+  --font-display: 'Zilla Slab', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
