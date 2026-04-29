@@ -1,0 +1,215 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{display:flex;flex-direction:column;gap:0;background:var(--color-background-primary)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.topbar-nav{display:flex;gap:4px}
+.nav-btn{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 12px;font-size:13px;cursor:pointer;color:var(--color-text-secondary)}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.view-switcher{display:flex;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.view-btn{background:none;border:none;padding:5px 14px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+.view-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500}
+.add-btn{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 14px;font-size:13px;cursor:pointer;color:var(--color-text-primary)}
+.add-btn:hover{background:var(--color-background-secondary)}
+
+.main{display:flex;height:620px}
+.sidebar{width:200px;border-right:0.5px solid var(--color-border-tertiary);padding:16px;display:flex;flex-direction:column;gap:20px;flex-shrink:0;overflow-y:auto}
+.mini-stats{display:flex;flex-direction:column;gap:8px}
+.stat-row{display:flex;flex-direction:column;gap:3px}
+.stat-label{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em}
+.stat-value{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.stat-bar{height:4px;border-radius:2px;background:var(--color-border-tertiary);margin-top:3px}
+.stat-fill{height:4px;border-radius:2px}
+.legend{display:flex;flex-direction:column;gap:6px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--color-text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.sidebar-section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px}
+
+.calendar{flex:1;overflow:auto}
+.cal-header{display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;background:var(--color-background-primary);z-index:10}
+.cal-corner{border-right:0.5px solid var(--color-border-tertiary)}
+.day-header{text-align:center;padding:10px 4px 8px;border-right:0.5px solid var(--color-border-tertiary)}
+.day-header:last-child{border-right:none}
+.day-name{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em}
+.day-num{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-top:2px}
+.day-num.today{width:32px;height:32px;background:#4285F4;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;font-size:15px}
+
+.time-grid{display:grid;grid-template-columns:52px repeat(7,1fr)}
+.time-col{border-right:0.5px solid var(--color-border-tertiary)}
+.time-label{height:48px;display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 6px 0 0;font-size:10px;color:var(--color-text-tertiary);position:relative;top:-6px}
+.day-col{border-right:0.5px solid var(--color-border-tertiary);position:relative}
+.day-col:last-child{border-right:none}
+.hour-cell{height:48px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.hour-cell:last-child{border-bottom:none}
+
+.event{position:absolute;left:3px;right:3px;border-radius:5px;padding:3px 6px;overflow:hidden;cursor:pointer;transition:opacity 0.1s;border-left:3px solid transparent}
+.event:hover{opacity:0.85}
+.event-title{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.event-sub{font-size:10px;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.sleep-ev{background:#C8CCFF;border-left-color:#6366F1;color:#312e81}
+.workout-ev{background:#BBF7D0;border-left-color:#16a34a;color:#14532d}
+.meal-ev{background:#FED7AA;border-left-color:#ea580c;color:#7c2d12}
+.water-ev{background:#BAE6FD;border-left-color:#0284c7;color:#0c4a6e}
+.rest-ev{background:#F3E8FF;border-left-color:#9333ea;color:#3b0764}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">April 2026</span>
+      <div class="topbar-nav">
+        <button class="nav-btn">&#8249;</button>
+        <button class="nav-btn">Today</button>
+        <button class="nav-btn">&#8250;</button>
+      </div>
+    </div>
+    <div class="view-switcher">
+      <button class="view-btn">Day</button>
+      <button class="view-btn active">Week</button>
+      <button class="view-btn">Month</button>
+    </div>
+    <button class="add-btn">+ Log event</button>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div>
+        <div class="sidebar-section-label">This week</div>
+        <div class="mini-stats">
+          <div class="stat-row">
+            <div class="stat-label">Sleep avg</div>
+            <div class="stat-value">7h 12m</div>
+            <div class="stat-bar"><div class="stat-fill" style="width:72%;background:#6366F1"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Workouts</div>
+            <div class="stat-value">4 / 5 planned</div>
+            <div class="stat-bar"><div class="stat-fill" style="width:80%;background:#16a34a"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Meals logged</div>
+            <div class="stat-value">18 / 21</div>
+            <div class="stat-bar"><div class="stat-fill" style="width:86%;background:#ea580c"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Hydration</div>
+            <div class="stat-value">6 cups/day avg</div>
+            <div class="stat-bar"><div class="stat-fill" style="width:75%;background:#0284c7"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label" style="margin-bottom:8px">Event types</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>Sleep</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>Workout</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ea580c"></div>Meal</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#0284c7"></div>Hydration</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#9333ea"></div>Rest / recovery</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label" style="margin-bottom:8px">Quick log</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="sendPrompt('Log a 30-minute run for this morning')" style="font-size:12px;text-align:left;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 10px;cursor:pointer;color:var(--color-text-secondary)">+ Run ↗</button>
+          <button onclick="sendPrompt('Log breakfast for today')" style="font-size:12px;text-align:left;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 10px;cursor:pointer;color:var(--color-text-secondary)">+ Breakfast ↗</button>
+          <button onclick="sendPrompt('Log my sleep last night — I went to bed at 11pm and woke up at 7am')" style="font-size:12px;text-align:left;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 10px;cursor:pointer;color:var(--color-text-secondary)">+ Sleep ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar">
+      <div class="cal-header">
+        <div class="cal-corner"></div>
+        <div class="day-header"><div class="day-name">Sun</div><div class="day-num">26</div></div>
+        <div class="day-header"><div class="day-name">Mon</div><div class="day-num">27</div></div>
+        <div class="day-header"><div class="day-name">Tue</div><div class="day-num">28</div></div>
+        <div class="day-header"><div class="day-name">Wed</div><div class="day-num today">29</div></div>
+        <div class="day-header"><div class="day-name">Thu</div><div class="day-num">30</div></div>
+        <div class="day-header"><div class="day-name">Fri</div><div class="day-num">1</div></div>
+        <div class="day-header"><div class="day-name">Sat</div><div class="day-num">2</div></div>
+      </div>
+
+      <div class="time-grid" id="grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const days = 7;
+const CELL_H = 48;
+
+const grid = document.getElementById('grid');
+
+const timeCol = document.createElement('div');
+timeCol.className = 'time-col';
+hours.forEach(h => {
+  const lbl = document.createElement('div');
+  lbl.className = 'time-label';
+  lbl.textContent = h === 0 ? '' : (h < 12 ? h + ' AM' : h === 12 ? '12 PM' : (h-12) + ' PM');
+  timeCol.appendChild(lbl);
+});
+grid.appendChild(timeCol);
+
+const events = [
+  {day:0, startH:22.5, dur:7.5, cls:'sleep-ev', title:'Sleep', sub:'10:30 PM – 6 AM'},
+  {day:1, startH:0, dur:5.75, cls:'sleep-ev', title:'Sleep', sub:'midnight – 5:45 AM'},
+  {day:1, startH:6, dur:1, cls:'workout-ev', title:'Morning run', sub:'5k · 28 min'},
+  {day:1, startH:7.5, dur:0.5, cls:'meal-ev', title:'Breakfast', sub:'Oats, eggs'},
+  {day:1, startH:12, dur:0.5, cls:'meal-ev', title:'Lunch', sub:'Salad, chicken'},
+  {day:1, startH:13, dur:0.25, cls:'water-ev', title:'Water', sub:'2 cups'},
+  {day:1, startH:18.5, dur:0.5, cls:'meal-ev', title:'Dinner', sub:'Pasta, vegetables'},
+  {day:1, startH:22, dur:7.5, cls:'sleep-ev', title:'Sleep', sub:'10 PM – 5:30 AM'},
+  {day:2, startH:0, dur:5.5, cls:'sleep-ev', title:'Sleep', sub:'cont.'},
+  {day:2, startH:5.5, dur:1.25, cls:'workout-ev', title:'Strength training', sub:'Upper body · 45 min'},
+  {day:2, startH:8, dur:0.5, cls:'meal-ev', title:'Breakfast', sub:'Smoothie, toast'},
+  {day:2, startH:12.5, dur:0.5, cls:'meal-ev', title:'Lunch', sub:'Soup, sandwich'},
+  {day:2, startH:19, dur:0.5, cls:'meal-ev', title:'Dinner', sub:'Stir fry'},
+  {day:2, startH:22.5, dur:7.5, cls:'sleep-ev', title:'Sleep', sub:'10:30 PM – 6 AM'},
+  {day:3, startH:0, dur:6, cls:'sleep-ev', title:'Sleep', sub:'cont.'},
+  {day:3, startH:6.5, dur:0.5, cls:'meal-ev', title:'Breakfast', sub:'Yogurt, fruit'},
+  {day:3, startH:7, dur:1, cls:'workout-ev', title:'Yoga', sub:'60 min · gentle'},
+  {day:3, startH:12, dur:0.5, cls:'meal-ev', title:'Lunch', sub:'Grain bowl'},
+  {day:3, startH:15, dur:0.25, cls:'water-ev', title:'Water', sub:'2 cups'},
+  {day:3, startH:18.5, dur:0.5, cls:'meal-ev', title:'Dinner', sub:'Salmon, rice'},
+  {day:3, startH:21, dur:0.75, cls:'rest-ev', title:'Wind-down', sub:'No screens'},
+  {day:3, startH:22, dur:8, cls:'sleep-ev', title:'Sleep', sub:'10 PM – 6 AM'},
+  {day:4, startH:0, dur:6, cls:'sleep-ev', title:'Sleep', sub:'cont.'},
+  {day:4, startH:6, dur:1, cls:'workout-ev', title:'Bike ride', sub:'12 mi · 55 min'},
+  {day:4, startH:7.5, dur:0.5, cls:'meal-ev', title:'Breakfast', sub:'Eggs, avocado'},
+  {day:4, startH:12.5, dur:0.5, cls:'meal-ev', title:'Lunch', sub:'Tacos'},
+  {day:4, startH:18, dur:0.5, cls:'meal-ev', title:'Dinner', sub:'planned'},
+  {day:5, startH:0, dur:7, cls:'sleep-ev', title:'Sleep', sub:'midnight – 7 AM'},
+  {day:5, startH:8, dur:0.5, cls:'meal-ev', title:'Breakfast', sub:'Pancakes'},
+  {day:5, startH:10, dur:1.5, cls:'workout-ev', title:'Long run', sub:'8 mi planned'},
+  {day:5, startH:12.5, dur:0.5, cls:'meal-ev', title:'Lunch', sub:'planned'},
+  {day:6, startH:23, dur:1, cls:'sleep-ev', title:'Sleep', sub:'11 PM →'},
+];
+
+for(let d=0; d<days; d++){
+  const col = document.createElement('div');
+  col.className = 'day-col';
+  hours.forEach(() => {
+    const cell = document.createElement('div');
+    cell.className = 'hour-cell';
+    col.appendChild(cell);
+  });
+  const dayEvents = events.filter(e => e.day === d);
+  dayEvents.forEach(ev => {
+    const el = document.createElement('div');
+    el.className = 'event ' + ev.cls;
+    el.style.top = (ev.startH * CELL_H) + 'px';
+    el.style.height = Math.max(ev.dur * CELL_H - 2, 18) + 'px';
+    el.innerHTML = `<div class="event-title">${ev.title}</div>${ev.dur > 0.4 ? `<div class="event-sub">${ev.sub}</div>` : ''}`;
+    col.appendChild(el);
+  });
+  grid.appendChild(col);
+}
+</script>

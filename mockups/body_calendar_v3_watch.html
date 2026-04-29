@@ -1,0 +1,369 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{font-family:var(--font-sans);background:var(--color-background-primary);min-height:700px;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.app-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.nav-row{display:flex;gap:4px}
+.nb{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;font-size:11px;cursor:pointer;color:var(--color-text-secondary)}
+.nb:hover{background:var(--color-background-secondary)}
+.vsw{display:flex;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.vb{background:none;border:none;padding:4px 11px;font-size:11px;cursor:pointer;color:var(--color-text-secondary)}
+.vb.on{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500}
+.tbr{display:flex;gap:7px;align-items:center;position:relative}
+.ab{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:4px 11px;font-size:11px;cursor:pointer;color:var(--color-text-primary)}
+.ab:hover{background:var(--color-background-secondary)}
+.watch-btn{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 11px;font-size:11px;cursor:pointer;color:var(--color-text-secondary);display:flex;align-items:center;gap:5px}
+.watch-btn:hover{background:var(--color-background-secondary)}
+.w-dot{width:7px;height:7px;border-radius:50%;background:#30d158}
+
+.watch-panel{position:absolute;top:34px;right:0;width:320px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:14px;z-index:30;display:none}
+.watch-panel.open{display:block}
+.wp-title{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+.wp-sub{font-size:11px;color:var(--color-text-secondary);margin-bottom:12px}
+.wp-section{margin-bottom:12px}
+.wp-slabel{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px}
+.wp-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wp-metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px}
+.wp-m-label{font-size:10px;color:var(--color-text-tertiary)}
+.wp-m-val{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-top:1px}
+.wp-m-sub{font-size:10px;color:var(--color-text-secondary)}
+.wp-import{width:100%;background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px;font-size:12px;cursor:pointer;color:var(--color-text-primary);margin-top:4px}
+.wp-import:hover{background:var(--color-background-secondary)}
+.wp-note{font-size:10px;color:var(--color-text-tertiary);margin-top:8px;line-height:1.5}
+.rings{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.ring-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ring-label{font-size:10px;color:var(--color-text-tertiary)}
+.ring-val{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.ring-bar{width:100%;height:5px;border-radius:3px;background:var(--color-border-tertiary);margin-top:2px}
+.ring-fill{height:5px;border-radius:3px}
+
+.main{display:flex;flex:1}
+.sidebar{width:186px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-sec{padding:12px 12px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.tp{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:var(--border-radius-md);cursor:pointer;margin-bottom:1px}
+.tp:hover{background:var(--color-background-secondary)}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tname{font-size:11px;color:var(--color-text-primary)}
+.tbadge{margin-left:auto;font-size:9px;background:var(--color-background-secondary);padding:1px 5px;border-radius:8px;color:var(--color-text-tertiary)}
+
+.cal-wrap{flex:1;overflow:auto;display:flex;flex-direction:column}
+.cal-hdr{display:grid;grid-template-columns:42px repeat(7,1fr);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;background:var(--color-background-primary);z-index:5}
+.chc{border-right:0.5px solid var(--color-border-tertiary)}
+.chd{text-align:center;padding:7px 2px 5px;border-right:0.5px solid var(--color-border-tertiary)}
+.chd:last-child{border-right:none}
+.dn{font-size:9px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em}
+.dnum{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-top:1px}
+.dnum.tod{width:26px;height:26px;background:#4285F4;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;font-size:12px}
+
+.tgrid{display:grid;grid-template-columns:42px repeat(7,1fr)}
+.tc{border-right:0.5px solid var(--color-border-tertiary)}
+.tl{height:42px;display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 4px 0 0;font-size:9px;color:var(--color-text-tertiary);position:relative;top:-5px}
+.dc{border-right:0.5px solid var(--color-border-tertiary);position:relative}
+.dc:last-child{border-right:none}
+.hc{height:42px;border-bottom:0.5px solid var(--color-border-tertiary)}
+
+.ev{position:absolute;left:2px;right:2px;border-radius:4px;padding:2px 5px;overflow:hidden;cursor:pointer;border-left:3px solid transparent}
+.ev:hover{opacity:0.8}
+.et{font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es{font-size:9px;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ewatch{position:absolute;right:3px;top:2px;width:6px;height:6px;border-radius:50%;background:#30d158}
+
+.food-modal-wrap{display:none;min-height:500px;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;padding:20px}
+.food-modal-wrap.open{display:flex}
+.food-modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-secondary);width:100%;max-width:440px;padding:18px}
+.fm-title{font-size:15px;font-weight:500;margin-bottom:14px;color:var(--color-text-primary)}
+.fm-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fm-label{font-size:11px;color:var(--color-text-secondary)}
+.fm-macros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.fm-macro{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.fm-macro-label{font-size:10px;color:var(--color-text-tertiary)}
+.fm-macro-val{font-size:16px;font-weight:500}
+.fm-btns{display:flex;gap:8px;justify-content:flex-end}
+.fm-cancel{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 14px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+.fm-save{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 14px;font-size:12px;cursor:pointer;color:var(--color-text-primary);font-weight:500}
+.cal-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
+.cal-bar-label{font-size:11px;color:var(--color-text-secondary)}
+.cal-track{flex:1;height:5px;background:var(--color-border-tertiary);border-radius:3px}
+.cal-fill{height:5px;border-radius:3px;background:#ea580c}
+.cal-count{font-size:11px;font-weight:500;color:var(--color-text-primary);min-width:60px;text-align:right}
+
+.water-bar{display:flex;gap:5px;align-items:center;padding:10px 12px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.wlabel{font-size:10px;color:var(--color-text-tertiary);width:38px;flex-shrink:0}
+.wcups{display:flex;gap:3px;flex:1}
+.wcup{width:16px;height:16px;border-radius:3px;border:0.5px solid var(--color-border-secondary);cursor:pointer;background:var(--color-background-secondary)}
+.wcup.filled{background:#0284c7;border-color:#0284c7}
+.wgoal{font-size:10px;color:var(--color-text-tertiary);margin-left:4px}
+
+.edit-btn{margin:10px 12px 8px;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 10px;font-size:11px;cursor:pointer;color:var(--color-text-secondary);width:calc(100% - 24px)}
+.edit-btn:hover{background:var(--color-background-secondary)}
+</style>
+
+<div class="app" id="app">
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="app-title">April 2026</span>
+    <div class="nav-row">
+      <button class="nb">&#8249;</button>
+      <button class="nb">Today</button>
+      <button class="nb">&#8250;</button>
+    </div>
+  </div>
+  <div class="vsw">
+    <button class="vb">Day</button>
+    <button class="vb on">Week</button>
+    <button class="vb">Month</button>
+  </div>
+  <div class="tbr">
+    <button class="watch-btn" onclick="toggleWatch()">
+      <div class="w-dot"></div>Apple Watch
+    </button>
+    <button class="ab" onclick="openFood()">+ Log meal ↗</button>
+    <div class="watch-panel" id="watch-panel">
+      <div class="wp-title">Apple Watch / Health</div>
+      <div class="wp-sub">Synced today at 9:41 AM via Health Auto Export</div>
+      <div class="wp-section">
+        <div class="wp-slabel">Activity rings</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#E24B4A;font-weight:500">Move</span><span style="color:var(--color-text-secondary)">387 / 500 cal</span></div><div class="ring-bar"><div class="ring-fill" style="width:77%;background:#E24B4A"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#30d158;font-weight:500">Exercise</span><span style="color:var(--color-text-secondary)">28 / 30 min</span></div><div class="ring-bar"><div class="ring-fill" style="width:93%;background:#30d158"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:#0284c7;font-weight:500">Stand</span><span style="color:var(--color-text-secondary)">9 / 12 hours</span></div><div class="ring-bar"><div class="ring-fill" style="width:75%;background:#0284c7"></div></div></div>
+        </div>
+      </div>
+      <div class="wp-section">
+        <div class="wp-slabel">Today's metrics</div>
+        <div class="wp-metrics">
+          <div class="wp-metric"><div class="wp-m-label">Resting HR</div><div class="wp-m-val">58 <span style="font-size:11px;font-weight:400">bpm</span></div></div>
+          <div class="wp-metric"><div class="wp-m-label">HRV</div><div class="wp-m-val">52 <span style="font-size:11px;font-weight:400">ms</span></div></div>
+          <div class="wp-metric"><div class="wp-m-label">Steps</div><div class="wp-m-val">6,842</div></div>
+          <div class="wp-metric"><div class="wp-m-label">VO2 max</div><div class="wp-m-val">41.2 <span style="font-size:11px;font-weight:400">est.</span></div></div>
+          <div class="wp-metric"><div class="wp-m-label">Active cal</div><div class="wp-m-val">387</div></div>
+          <div class="wp-metric"><div class="wp-m-label">Sleep score</div><div class="wp-m-val">82 <span style="font-size:11px;font-weight:400">/ 100</span></div></div>
+        </div>
+      </div>
+      <button class="wp-import" onclick="sendPrompt('Help me set up Health Auto Export on my iPhone to sync Apple Watch data to this tracker automatically')">Set up auto-sync on my iPhone ↗</button>
+      <div class="wp-note">Watch → iPhone Health app → Health Auto Export → webhook → here. One-time setup, then automatic.</div>
+    </div>
+  </div>
+</div>
+
+<div id="food-modal-wrap" class="food-modal-wrap">
+  <div class="food-modal">
+    <div class="fm-title">Log a meal</div>
+    <div class="cal-bar">
+      <span class="cal-label" style="font-size:11px;color:var(--color-text-secondary)">Today</span>
+      <div class="cal-track"><div class="cal-fill" id="cal-fill-bar" style="width:63%"></div></div>
+      <span class="cal-count" id="cal-count-display">1,260 / 2,000</span>
+    </div>
+    <div class="fm-row">
+      <label class="fm-label">What did you eat?</label>
+      <input type="text" id="food-input" placeholder="e.g. oatmeal with banana and honey" style="font-size:13px">
+    </div>
+    <div class="fm-row">
+      <label class="fm-label">Meal type</label>
+      <select style="font-size:13px" id="meal-type">
+        <option>Breakfast</option><option>Lunch</option><option selected>Dinner</option><option>Snack</option>
+      </select>
+    </div>
+    <div class="fm-macros">
+      <div class="fm-macro">
+        <div class="fm-macro-label">Calories</div>
+        <div class="fm-macro-val" style="color:#ea580c" id="cal-est">—</div>
+      </div>
+      <div class="fm-macro">
+        <div class="fm-macro-label">Protein</div>
+        <div class="fm-macro-val" style="color:#16a34a" id="prot-est">—</div>
+      </div>
+      <div class="fm-macro">
+        <div class="fm-macro-label">Carbs</div>
+        <div class="fm-macro-val" style="color:#0284c7" id="carb-est">—</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--color-text-tertiary);margin-bottom:12px">AI estimate — tap "Get estimate" or log it as-is</div>
+    <div class="fm-btns">
+      <button class="fm-cancel" onclick="closeFood()">Cancel</button>
+      <button class="fm-save" onclick="sendPrompt('Estimate calories, protein, and carbs for: ' + document.getElementById('food-input').value + ' — give me a quick 3-number answer')">Get AI estimate ↗</button>
+      <button class="fm-save" onclick="closeFood()">Log it</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sb-sec">
+      <div class="sbl">Active trackers</div>
+      <div class="tp"><div class="tdot" style="background:#6366F1"></div><span class="tname">Sleep</span><span class="tbadge">Watch</span></div>
+      <div class="tp"><div class="tdot" style="background:#16a34a"></div><span class="tname">Workout</span><span class="tbadge">Watch</span></div>
+      <div class="tp"><div class="tdot" style="background:#ea580c"></div><span class="tname">Meals</span></div>
+      <div class="tp"><div class="tdot" style="background:#0284c7"></div><span class="tname">Water</span></div>
+      <div class="tp"><div class="tdot" style="background:#D4537E"></div><span class="tname">Mood</span></div>
+      <div class="tp"><div class="tdot" style="background:#888780"></div><span class="tname">Weight</span><span class="tbadge">Watch</span></div>
+      <div class="tp"><div class="tdot" style="background:#ED93B1"></div><span class="tname">Cycle</span></div>
+      <div class="tp"><div class="tdot" style="background:#BA7517"></div><span class="tname">Alcohol</span></div>
+      <div class="tp"><div class="tdot" style="background:#E24B4A"></div><span class="tname">Heart rate</span><span class="tbadge">Watch</span></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sbl">Today</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Calories</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">1,260 / 2,000</div><div class="ring-bar" style="margin-top:3px"><div class="ring-fill" style="width:63%;background:#ea580c"></div></div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Water</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">6 / 8 cups</div><div class="ring-bar" style="margin-top:3px"><div class="ring-fill" style="width:75%;background:#0284c7"></div></div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Active cal</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">387 burned</div><div class="ring-bar" style="margin-top:3px"><div class="ring-fill" style="width:77%;background:#E24B4A"></div></div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Net calories</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">873 remaining</div></div>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sbl">This week</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Sleep avg</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">7h 18m</div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Workouts</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">3 / 5 planned</div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">Avg daily cal</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">1,840 kcal</div></div>
+        <div><div style="font-size:10px;color:var(--color-text-tertiary)">HRV trend</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">52 ms ↑</div></div>
+      </div>
+    </div>
+
+    <button class="edit-btn">Edit trackers</button>
+  </div>
+
+  <div class="cal-wrap">
+    <div class="water-bar">
+      <span class="wlabel">Water</span>
+      <div class="wcups" id="wcups"></div>
+      <span class="wgoal" id="wgoal-label">6 / 8 cups today</span>
+    </div>
+
+    <div class="cal-hdr">
+      <div class="chc"></div>
+      <div class="chd"><div class="dn">Sun</div><div class="dnum">26</div></div>
+      <div class="chd"><div class="dn">Mon</div><div class="dnum">27</div></div>
+      <div class="chd"><div class="dn">Tue</div><div class="dnum">28</div></div>
+      <div class="chd"><div class="dn">Wed</div><div class="dnum tod">29</div></div>
+      <div class="chd"><div class="dn">Thu</div><div class="dnum">30</div></div>
+      <div class="chd"><div class="dn">Fri</div><div class="dnum">1</div></div>
+      <div class="chd"><div class="dn">Sat</div><div class="dnum">2</div></div>
+    </div>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+</div>
+</div>
+
+<script>
+let waterCups=6;
+const GOAL=8;
+const CELL=42;
+
+function buildWater(){
+  const c=document.getElementById('wcups');
+  c.innerHTML='';
+  for(let i=0;i<GOAL;i++){
+    const cup=document.createElement('div');
+    cup.className='wcup'+(i<waterCups?' filled':'');
+    cup.onclick=()=>{waterCups=i<waterCups?i:i+1;buildWater();};
+    c.appendChild(cup);
+  }
+  document.getElementById('wgoal-label').textContent=waterCups+' / '+GOAL+' cups today';
+}
+
+function toggleWatch(){document.getElementById('watch-panel').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.tbr'))document.getElementById('watch-panel').classList.remove('open');});
+
+function openFood(){document.getElementById('food-modal-wrap').classList.add('open');}
+function closeFood(){document.getElementById('food-modal-wrap').classList.remove('open');}
+
+const ITEMS=[
+  {id:'sleep',color:'#6366F1',bg:'#EEEDFE',tc:'#3C3489',watch:true},
+  {id:'workout',color:'#16a34a',bg:'#EAF3DE',tc:'#27500A',watch:true},
+  {id:'meals',color:'#ea580c',bg:'#FAECE7',tc:'#712B13',watch:false},
+  {id:'water',color:'#0284c7',bg:'#E6F1FB',tc:'#0C447C',watch:false},
+  {id:'mood',color:'#D4537E',bg:'#FBEAF0',tc:'#72243E',watch:false},
+  {id:'weight',color:'#888780',bg:'#F1EFE8',tc:'#444441',watch:true},
+  {id:'cycle',color:'#ED93B1',bg:'#FBEAF0',tc:'#993556',watch:false},
+  {id:'alcohol',color:'#BA7517',bg:'#FAEEDA',tc:'#633806',watch:false},
+  {id:'hr',color:'#E24B4A',bg:'#FCEBEB',tc:'#791F1F',watch:true},
+];
+function getIt(id){return ITEMS.find(x=>x.id===id)||ITEMS[0];}
+
+const EVENTS=[
+  {day:0,sh:22.5,dur:7.5,id:'sleep',title:'Sleep',sub:'10:30p – 6a',watch:true},
+  {day:1,sh:0,dur:5.75,id:'sleep',title:'Sleep',sub:'cont.',watch:true},
+  {day:1,sh:6,dur:1,id:'workout',title:'Morning run',sub:'5k · 387 cal',watch:true},
+  {day:1,sh:7.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Oats, banana · 420 cal'},
+  {day:1,sh:8.5,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:1,sh:12,dur:0.5,id:'meals',title:'Lunch',sub:'Salad, chicken · 510 cal'},
+  {day:1,sh:13.2,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:1,sh:18.5,dur:0.5,id:'meals',title:'Dinner',sub:'Pasta, veg · 680 cal'},
+  {day:1,sh:20.5,dur:0.3,id:'alcohol',title:'Wine',sub:'1 glass · 125 cal'},
+  {day:1,sh:21.5,dur:0.25,id:'mood',title:'Mood',sub:'Good'},
+  {day:1,sh:22,dur:7.5,id:'sleep',title:'Sleep',sub:'10p – 5:30a',watch:true},
+  {day:2,sh:0,dur:5.5,id:'sleep',title:'Sleep',sub:'cont.',watch:true},
+  {day:2,sh:5.5,dur:1.25,id:'workout',title:'Strength',sub:'Upper body · 45m · 310 cal',watch:true},
+  {day:2,sh:8,dur:0.5,id:'meals',title:'Breakfast',sub:'Smoothie · 380 cal'},
+  {day:2,sh:9,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:2,sh:12.5,dur:0.5,id:'meals',title:'Lunch',sub:'Soup, sandwich · 540 cal'},
+  {day:2,sh:14,dur:0.3,id:'mood',title:'Mood',sub:'Anxious'},
+  {day:2,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'Stir fry · 620 cal'},
+  {day:2,sh:22.5,dur:7.5,id:'sleep',title:'Sleep',sub:'10:30p – 6a',watch:true},
+  {day:3,sh:0,dur:6,id:'sleep',title:'Sleep',sub:'cont.',watch:true},
+  {day:3,sh:6.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Yogurt, fruit · 310 cal'},
+  {day:3,sh:7,dur:1,id:'workout',title:'Yoga',sub:'60 min · 180 cal',watch:true},
+  {day:3,sh:9,dur:0.2,id:'weight',title:'Weigh-in',sub:'172 lbs',watch:true},
+  {day:3,sh:9.5,dur:0.2,id:'hr',title:'Resting HR',sub:'58 bpm',watch:true},
+  {day:3,sh:12,dur:0.5,id:'meals',title:'Lunch',sub:'Grain bowl · 580 cal'},
+  {day:3,sh:13,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:3,sh:15.5,dur:0.25,id:'cycle',title:'Ovulation',sub:'LH surge'},
+  {day:3,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'Salmon, rice · 640 cal'},
+  {day:3,sh:21,dur:0.25,id:'mood',title:'Mood',sub:'Great'},
+  {day:3,sh:22,dur:8,id:'sleep',title:'Sleep',sub:'10p – 6a',watch:true},
+  {day:4,sh:0,dur:6,id:'sleep',title:'Sleep',sub:'cont.',watch:true},
+  {day:4,sh:6,dur:1,id:'workout',title:'Bike ride',sub:'12 mi · 55m · 520 cal',watch:true},
+  {day:4,sh:7.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Eggs, avocado · 490 cal'},
+  {day:4,sh:8.5,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:4,sh:12.5,dur:0.5,id:'meals',title:'Lunch',sub:'Tacos · 610 cal'},
+  {day:4,sh:14,dur:0.2,id:'water',title:'Water',sub:'2 cups'},
+  {day:4,sh:18,dur:0.5,id:'meals',title:'Dinner',sub:'planned'},
+  {day:5,sh:0,dur:7,id:'sleep',title:'Sleep',sub:'midnight – 7a',watch:true},
+  {day:5,sh:8,dur:0.5,id:'meals',title:'Breakfast',sub:'Pancakes · 520 cal'},
+  {day:5,sh:10,dur:1.5,id:'workout',title:'Long run',sub:'8 mi planned',watch:true},
+  {day:5,sh:12.5,dur:0.5,id:'meals',title:'Lunch',sub:'planned'},
+  {day:5,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'planned'},
+  {day:5,sh:21,dur:0.3,id:'alcohol',title:'Beer',sub:'2 drinks · 300 cal'},
+  {day:6,sh:23,dur:1,id:'sleep',title:'Sleep',sub:'11p →',watch:true},
+];
+
+function buildGrid(){
+  const grid=document.getElementById('tgrid');
+  grid.innerHTML='';
+  const hours=Array.from({length:24},(_,i)=>i);
+  const tc=document.createElement('div');
+  tc.className='tc';
+  hours.forEach(h=>{
+    const l=document.createElement('div');l.className='tl';
+    l.textContent=h===0?'':(h<12?h+' AM':h===12?'12 PM':(h-12)+' PM');
+    tc.appendChild(l);
+  });
+  grid.appendChild(tc);
+
+  for(let d=0;d<7;d++){
+    const col=document.createElement('div');col.className='dc';
+    hours.forEach(()=>{const c=document.createElement('div');c.className='hc';col.appendChild(c);});
+    EVENTS.filter(e=>e.day===d).forEach(ev=>{
+      const it=getIt(ev.id);
+      const el=document.createElement('div');el.className='ev';
+      el.style.top=(ev.sh*CELL)+'px';
+      el.style.height=Math.max(ev.dur*CELL-2,15)+'px';
+      el.style.background=it.bg;
+      el.style.borderLeftColor=it.color;
+      el.innerHTML=`<div class="et" style="color:${it.tc}">${ev.title}</div>${ev.dur>0.4?`<div class="es" style="color:${it.tc}">${ev.sub}</div>`:''}`;
+      if(ev.watch){const dot=document.createElement('div');dot.className='ewatch';el.appendChild(dot);}
+      col.appendChild(el);
+    });
+    grid.appendChild(col);
+  }
+}
+
+buildWater();
+buildGrid();
+</script>

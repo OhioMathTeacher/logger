@@ -1,0 +1,371 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{font-family:var(--font-sans);display:flex;flex-direction:column;background:var(--color-background-primary);min-height:640px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.app-title{font-size:17px;font-weight:500;color:var(--color-text-primary)}
+.nav-btn{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.view-switcher{display:flex;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.vbtn{background:none;border:none;padding:4px 12px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+.vbtn.active{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500}
+.right-btns{display:flex;gap:8px;align-items:center}
+.gcal-btn{background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 12px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)}
+.gcal-btn:hover{background:var(--color-background-secondary)}
+.add-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:4px 12px;font-size:12px;cursor:pointer;color:var(--color-text-primary)}
+.add-btn:hover{background:var(--color-background-secondary)}
+
+.main{display:flex;flex:1}
+.sidebar{width:192px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;flex-shrink:0}
+.sb-section{padding:14px 14px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sb-label{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+.tracker-pill{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:var(--border-radius-md);cursor:pointer;margin-bottom:2px;user-select:none}
+.tracker-pill:hover{background:var(--color-background-secondary)}
+.tracker-pill.off{opacity:0.4}
+.t-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.t-name{font-size:12px;color:var(--color-text-primary)}
+.t-check{margin-left:auto;font-size:10px;color:var(--color-text-tertiary)}
+.customize-btn{margin:10px 14px;background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 10px;font-size:12px;cursor:pointer;color:var(--color-text-secondary);width:calc(100% - 28px)}
+.customize-btn:hover{background:var(--color-background-secondary)}
+
+.cal-wrap{flex:1;overflow:auto;display:flex;flex-direction:column}
+.cal-header{display:grid;grid-template-columns:44px repeat(7,1fr);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;background:var(--color-background-primary);z-index:5}
+.ch-corner{border-right:0.5px solid var(--color-border-tertiary)}
+.ch-day{text-align:center;padding:8px 2px 6px;border-right:0.5px solid var(--color-border-tertiary)}
+.ch-day:last-child{border-right:none}
+.dname{font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em}
+.dnum{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-top:1px}
+.dnum.today{width:28px;height:28px;background:#4285F4;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;font-size:13px}
+
+.time-grid{display:grid;grid-template-columns:44px repeat(7,1fr);flex:1}
+.tc{border-right:0.5px solid var(--color-border-tertiary)}
+.tlabel{height:44px;display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 5px 0 0;font-size:9px;color:var(--color-text-tertiary);position:relative;top:-5px}
+.dcol{border-right:0.5px solid var(--color-border-tertiary);position:relative}
+.dcol:last-child{border-right:none}
+.hcell{height:44px;border-bottom:0.5px solid var(--color-border-tertiary)}
+
+.ev{position:absolute;left:2px;right:2px;border-radius:4px;padding:2px 5px;overflow:hidden;cursor:pointer;border-left:3px solid transparent}
+.ev:hover{opacity:0.8}
+.et{font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es{font-size:9px;opacity:0.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.gcal-panel{position:absolute;top:36px;right:0;width:300px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:16px;z-index:20;display:none}
+.gcal-panel.open{display:block}
+.gcal-title{font-size:14px;font-weight:500;margin-bottom:12px;color:var(--color-text-primary)}
+.gcal-option{display:flex;flex-direction:column;gap:4px;padding:10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;cursor:pointer}
+.gcal-option:hover{background:var(--color-background-secondary)}
+.gcal-option-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.gcal-option-desc{font-size:11px;color:var(--color-text-secondary)}
+.gcal-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;margin-top:3px}
+.easy{background:#EAF3DE;color:#27500A}
+.medium{background:#FAEEDA;color:#633806}
+
+.setup-screen{padding:24px;max-width:560px;margin:0 auto}
+.setup-title{font-size:20px;font-weight:500;margin-bottom:6px;color:var(--color-text-primary)}
+.setup-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:20px}
+.cat-group{margin-bottom:18px}
+.cat-group-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.cat-items{display:flex;flex-wrap:wrap;gap:8px}
+.cat-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:20px;cursor:pointer;font-size:12px;color:var(--color-text-secondary);user-select:none;transition:all 0.1s}
+.cat-chip:hover{border-color:var(--color-border-secondary)}
+.cat-chip.sel{color:var(--color-text-primary);font-weight:500;border-width:1.5px}
+.chip-dot{width:8px;height:8px;border-radius:50%}
+.setup-footer{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.setup-hint{font-size:12px;color:var(--color-text-tertiary)}
+.start-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 20px;font-size:13px;cursor:pointer;color:var(--color-text-primary);font-weight:500}
+.start-btn:hover{background:var(--color-background-secondary)}
+</style>
+
+<div class="app" id="app">
+
+<div id="setup-view" class="setup-screen">
+  <h2 style="font-size:20px;font-weight:500;margin-bottom:6px;color:var(--color-text-primary)">What do you want to track?</h2>
+  <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px">Pick a handful. You can always change these later.</p>
+
+  <div id="cat-groups"></div>
+
+  <div class="setup-footer">
+    <span class="setup-hint" id="sel-count">0 selected</span>
+    <button class="start-btn" onclick="launchCalendar()">Open calendar →</button>
+  </div>
+</div>
+
+<div id="cal-view" style="display:none;flex-direction:column;flex:1">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="app-title">April 2026</span>
+      <div style="display:flex;gap:4px">
+        <button class="nav-btn">&#8249;</button>
+        <button class="nav-btn">Today</button>
+        <button class="nav-btn">&#8250;</button>
+      </div>
+    </div>
+    <div class="view-switcher">
+      <button class="vbtn">Day</button>
+      <button class="vbtn active">Week</button>
+      <button class="vbtn">Month</button>
+    </div>
+    <div class="right-btns" style="position:relative">
+      <button class="gcal-btn" onclick="toggleGcal()">Google Calendar</button>
+      <button class="add-btn" onclick="sendPrompt('Log a new health event for today')">+ Log ↗</button>
+      <div class="gcal-panel" id="gcal-panel">
+        <div class="gcal-title">Google Calendar sync</div>
+        <div class="gcal-option" onclick="sendPrompt('Export my health tracker data as an ICS file I can import into Google Calendar')">
+          <div class="gcal-option-title">Export as .ics file</div>
+          <div class="gcal-option-desc">Download your logged events and import into any calendar app</div>
+          <span class="gcal-badge easy">Easiest — no login needed</span>
+        </div>
+        <div class="gcal-option" onclick="sendPrompt('Set up a read-only subscription link so Google Calendar shows my health events automatically')">
+          <div class="gcal-option-title">Subscribe via calendar URL</div>
+          <div class="gcal-option-desc">Google Calendar polls a link — your events stay in sync automatically</div>
+          <span class="gcal-badge medium">Easy — one-time setup</span>
+        </div>
+        <div class="gcal-option" onclick="sendPrompt('Connect to Google Calendar API so I can import my real meetings and schedule workouts around them')">
+          <div class="gcal-option-title">Two-way API sync</div>
+          <div class="gcal-option-desc">Read your real meetings, write health events back — full integration</div>
+          <span class="gcal-badge medium">Requires OAuth login</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Active trackers</div>
+        <div id="tracker-list"></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">This week</div>
+        <div id="week-stats" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <button class="customize-btn" onclick="showSetup()">Edit trackers</button>
+    </div>
+
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <div class="ch-corner"></div>
+        <div class="ch-day"><div class="dname">Sun</div><div class="dnum">26</div></div>
+        <div class="ch-day"><div class="dname">Mon</div><div class="dnum">27</div></div>
+        <div class="ch-day"><div class="dname">Tue</div><div class="dnum">28</div></div>
+        <div class="ch-day"><div class="dname">Wed</div><div class="dnum today">29</div></div>
+        <div class="ch-day"><div class="dname">Thu</div><div class="dnum">30</div></div>
+        <div class="ch-day"><div class="dname">Fri</div><div class="dnum">1</div></div>
+        <div class="ch-day"><div class="dname">Sat</div><div class="dnum">2</div></div>
+      </div>
+      <div class="time-grid" id="tgrid"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const CATEGORIES = [
+  {group:'Movement', items:[
+    {id:'sleep',label:'Sleep',color:'#6366F1',bg:'#EEEDFE',tc:'#3C3489'},
+    {id:'workout',label:'Workout',color:'#16a34a',bg:'#EAF3DE',tc:'#27500A'},
+    {id:'steps',label:'Steps / walking',color:'#0F6E56',bg:'#E1F5EE',tc:'#085041'},
+  ]},
+  {group:'Nutrition', items:[
+    {id:'meals',label:'Meals',color:'#ea580c',bg:'#FAECE7',tc:'#712B13'},
+    {id:'hydration',label:'Hydration',color:'#0284c7',bg:'#E6F1FB',tc:'#0C447C'},
+    {id:'alcohol',label:'Alcohol',color:'#BA7517',bg:'#FAEEDA',tc:'#633806'},
+    {id:'caffeine',label:'Caffeine',color:'#5F5E5A',bg:'#F1EFE8',tc:'#2C2C2A'},
+  ]},
+  {group:'Mind & mood', items:[
+    {id:'mood',label:'Mood',color:'#D4537E',bg:'#FBEAF0',tc:'#72243E'},
+    {id:'anxiety',label:'Anxiety / stress',color:'#993556',bg:'#FBEAF0',tc:'#4B1528'},
+    {id:'focus',label:'Focus / brain fog',color:'#534AB7',bg:'#EEEDFE',tc:'#26215C'},
+  ]},
+  {group:'Body', items:[
+    {id:'weight',label:'Weight',color:'#888780',bg:'#F1EFE8',tc:'#444441'},
+    {id:'pain',label:'Pain / symptoms',color:'#E24B4A',bg:'#FCEBEB',tc:'#791F1F'},
+    {id:'meds',label:'Medications',color:'#378ADD',bg:'#E6F1FB',tc:'#0C447C'},
+  ]},
+  {group:'Cycle', items:[
+    {id:'period',label:'Menstruation',color:'#D85A30',bg:'#FAECE7',tc:'#712B13'},
+    {id:'ovulation',label:'Ovulation',color:'#ED93B1',bg:'#FBEAF0',tc:'#72243E'},
+    {id:'fertile',label:'Fertile window',color:'#F4C0D1',bg:'#FBEAF0',tc:'#993556'},
+  ]},
+  {group:'Lifestyle', items:[
+    {id:'sunlight',label:'Sunlight',color:'#EF9F27',bg:'#FAEEDA',tc:'#633806'},
+    {id:'screen',label:'Screen time',color:'#7F77DD',bg:'#EEEDFE',tc:'#3C3489'},
+    {id:'social',label:'Social time',color:'#5DCAA5',bg:'#E1F5EE',tc:'#085041'},
+    {id:'journal',label:'Journaling',color:'#B4B2A9',bg:'#F1EFE8',tc:'#444441'},
+  ]},
+];
+
+const DEFAULTS = ['sleep','workout','meals','hydration','mood','weight'];
+let selected = new Set(DEFAULTS);
+
+function getItem(id){
+  for(const g of CATEGORIES) for(const it of g.items) if(it.id===id) return it;
+  return null;
+}
+
+function buildSetup(){
+  const container = document.getElementById('cat-groups');
+  container.innerHTML='';
+  CATEGORIES.forEach(g=>{
+    const div=document.createElement('div');
+    div.className='cat-group';
+    div.innerHTML=`<div class="cat-group-label">${g.group}</div><div class="cat-items" id="grp-${g.group.replace(/\W/g,'')}"></div>`;
+    container.appendChild(div);
+    const row=div.querySelector('.cat-items');
+    g.items.forEach(it=>{
+      const chip=document.createElement('div');
+      chip.className='cat-chip'+(selected.has(it.id)?' sel':'');
+      chip.style.borderColor=selected.has(it.id)?it.color:'';
+      chip.innerHTML=`<div class="chip-dot" style="background:${it.color}"></div>${it.label}`;
+      chip.onclick=()=>{
+        if(selected.has(it.id)){selected.delete(it.id);chip.classList.remove('sel');chip.style.borderColor='';}
+        else{selected.add(it.id);chip.classList.add('sel');chip.style.borderColor=it.color;}
+        document.getElementById('sel-count').textContent=selected.size+' selected';
+      };
+      row.appendChild(chip);
+    });
+  });
+  document.getElementById('sel-count').textContent=selected.size+' selected';
+}
+
+function showSetup(){
+  document.getElementById('setup-view').style.display='block';
+  document.getElementById('cal-view').style.display='none';
+  buildSetup();
+}
+
+function launchCalendar(){
+  document.getElementById('setup-view').style.display='none';
+  const cv=document.getElementById('cal-view');
+  cv.style.display='flex';
+  buildSidebar();
+  buildGrid();
+}
+
+function buildSidebar(){
+  const list=document.getElementById('tracker-list');
+  list.innerHTML='';
+  selected.forEach(id=>{
+    const it=getItem(id);
+    if(!it)return;
+    const p=document.createElement('div');
+    p.className='tracker-pill';
+    p.innerHTML=`<div class="t-dot" style="background:${it.color}"></div><span class="t-name">${it.label}</span>`;
+    list.appendChild(p);
+  });
+
+  const stats=document.getElementById('week-stats');
+  stats.innerHTML='';
+  const statData={
+    sleep:{label:'Sleep avg',val:'7h 18m'},
+    workout:{label:'Workouts',val:'3 / 5'},
+    meals:{label:'Meals logged',val:'16 / 21'},
+    hydration:{label:'Hydration',val:'6 cups/day'},
+    mood:{label:'Mood avg',val:'Good'},
+    weight:{label:'Weight',val:'172 lbs'},
+    alcohol:{label:'Drinks',val:'3 this week'},
+    anxiety:{label:'Stress avg',val:'Low'},
+  };
+  selected.forEach(id=>{
+    if(!statData[id])return;
+    const it=getItem(id);
+    const d=statData[id];
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;flex-direction:column;gap:2px';
+    row.innerHTML=`<div style="font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em">${d.label}</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${d.val}</div><div style="height:3px;border-radius:2px;background:var(--color-border-tertiary);margin-top:1px"><div style="height:3px;border-radius:2px;width:72%;background:${it?it.color:'#888'}"></div></div>`;
+    stats.appendChild(row);
+  });
+}
+
+const CELL=44;
+const EVENTS_ALL=[
+  {day:0,sh:22.5,dur:7.5,id:'sleep',title:'Sleep',sub:'10:30p – 6a'},
+  {day:1,sh:0,dur:5.75,id:'sleep',title:'Sleep',sub:'cont.'},
+  {day:1,sh:6,dur:1,id:'workout',title:'Morning run',sub:'5k · 28 min'},
+  {day:1,sh:7.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Oats, eggs'},
+  {day:1,sh:8.25,dur:0.2,id:'caffeine',title:'Coffee',sub:'12 oz'},
+  {day:1,sh:12,dur:0.5,id:'meals',title:'Lunch',sub:'Salad, chicken'},
+  {day:1,sh:13,dur:0.25,id:'hydration',title:'Water',sub:'2 cups'},
+  {day:1,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'Pasta'},
+  {day:1,sh:20.5,dur:0.3,id:'alcohol',title:'Wine',sub:'1 glass'},
+  {day:1,sh:21.5,dur:0.3,id:'mood',title:'Mood check',sub:'Good'},
+  {day:1,sh:22,dur:7.5,id:'sleep',title:'Sleep',sub:'10p – 5:30a'},
+  {day:2,sh:0,dur:5.5,id:'sleep',title:'Sleep',sub:'cont.'},
+  {day:2,sh:5.5,dur:1.25,id:'workout',title:'Strength',sub:'Upper body · 45m'},
+  {day:2,sh:8,dur:0.5,id:'meals',title:'Breakfast',sub:'Smoothie'},
+  {day:2,sh:12.5,dur:0.5,id:'meals',title:'Lunch',sub:'Soup, sandwich'},
+  {day:2,sh:14,dur:0.3,id:'mood',title:'Mood check',sub:'Anxious'},
+  {day:2,sh:14.3,dur:0.2,id:'anxiety',title:'Stress note',sub:'Work deadline'},
+  {day:2,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'Stir fry'},
+  {day:2,sh:22.5,dur:7.5,id:'sleep',title:'Sleep',sub:'10:30p – 6a'},
+  {day:3,sh:0,dur:6,id:'sleep',title:'Sleep',sub:'cont.'},
+  {day:3,sh:6.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Yogurt, fruit'},
+  {day:3,sh:7,dur:1,id:'workout',title:'Yoga',sub:'60 min'},
+  {day:3,sh:9,dur:0.2,id:'weight',title:'Weigh-in',sub:'172 lbs'},
+  {day:3,sh:12,dur:0.5,id:'meals',title:'Lunch',sub:'Grain bowl'},
+  {day:3,sh:15,dur:0.25,id:'hydration',title:'Water',sub:'2 cups'},
+  {day:3,sh:15.5,dur:0.25,id:'ovulation',title:'Ovulation',sub:'LH surge detected'},
+  {day:3,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'Salmon, rice'},
+  {day:3,sh:21,dur:0.5,id:'mood',title:'Mood check',sub:'Great'},
+  {day:3,sh:22,dur:8,id:'sleep',title:'Sleep',sub:'10p – 6a'},
+  {day:4,sh:0,dur:6,id:'sleep',title:'Sleep',sub:'cont.'},
+  {day:4,sh:6,dur:1,id:'workout',title:'Bike ride',sub:'12 mi · 55m'},
+  {day:4,sh:7.5,dur:0.5,id:'meals',title:'Breakfast',sub:'Eggs, avocado'},
+  {day:4,sh:9,dur:0.2,id:'meds',title:'Medication',sub:'Taken'},
+  {day:4,sh:12.5,dur:0.5,id:'meals',title:'Lunch',sub:'Tacos'},
+  {day:4,sh:15,dur:0.25,id:'fertile',title:'Fertile window',sub:'Day 2'},
+  {day:4,sh:18,dur:0.5,id:'meals',title:'Dinner',sub:'planned'},
+  {day:5,sh:0,dur:7,id:'sleep',title:'Sleep',sub:'midnight – 7a'},
+  {day:5,sh:8,dur:0.5,id:'meals',title:'Breakfast',sub:'Pancakes'},
+  {day:5,sh:10,dur:1.5,id:'workout',title:'Long run',sub:'8 mi planned'},
+  {day:5,sh:19,dur:0.5,id:'meals',title:'Dinner',sub:'planned'},
+  {day:5,sh:21,dur:0.3,id:'alcohol',title:'Beer',sub:'2 drinks'},
+  {day:5,sh:22,dur:0.3,id:'mood',title:'Mood check',sub:'Relaxed'},
+  {day:6,sh:23,dur:1,id:'sleep',title:'Sleep',sub:'11p →'},
+];
+
+function buildGrid(){
+  const grid=document.getElementById('tgrid');
+  grid.innerHTML='';
+  const hours=Array.from({length:24},(_,i)=>i);
+  const tc=document.createElement('div');
+  tc.className='tc';
+  hours.forEach(h=>{
+    const l=document.createElement('div');
+    l.className='tlabel';
+    l.textContent=h===0?'':(h<12?h+' AM':h===12?'12 PM':(h-12)+' PM');
+    tc.appendChild(l);
+  });
+  grid.appendChild(tc);
+
+  for(let d=0;d<7;d++){
+    const col=document.createElement('div');
+    col.className='dcol';
+    hours.forEach(()=>{const c=document.createElement('div');c.className='hcell';col.appendChild(c);});
+    const dayEvs=EVENTS_ALL.filter(e=>e.day===d&&selected.has(e.id));
+    dayEvs.forEach(ev=>{
+      const it=getItem(ev.id);
+      if(!it)return;
+      const el=document.createElement('div');
+      el.className='ev';
+      el.style.top=(ev.sh*CELL)+'px';
+      el.style.height=Math.max(ev.dur*CELL-2,16)+'px';
+      el.style.background=it.bg;
+      el.style.borderLeftColor=it.color;
+      el.innerHTML=`<div class="et" style="color:${it.tc}">${ev.title}</div>${ev.dur>0.4?`<div class="es" style="color:${it.tc}">${ev.sub}</div>`:''}`;
+      col.appendChild(el);
+    });
+    grid.appendChild(col);
+  }
+}
+
+function toggleGcal(){
+  document.getElementById('gcal-panel').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.right-btns')) document.getElementById('gcal-panel').classList.remove('open');
+});
+
+buildSetup();
+</script>
